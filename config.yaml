@@ -1,0 +1,26 @@
+---
+name: "Headscale"
+version: "0.1.0"
+slug: "headscale"
+description: "Headscale is an open source, self-hosted implementation of the Tailscale control server"
+url: https://headscale.net/
+codenotary: alessio.bazzanella@me.com
+webui: "[PROTO:ssl]://[HOST]:[PORT:8080]"
+init: false
+arch:
+  - aarch64
+  - amd64
+ports:
+  8080/tcp: 8080
+  9090/tcp: null
+ports_description:
+  8080/tcp: Headscale API
+  9090/tcp: Headscale Metrics
+map:
+  - type: addon_config
+    path: /etc/headscale
+    read_only: False
+  - type: data
+    path: /var/lib/headscale
+backup_exclude:
+  - "*/logs"
