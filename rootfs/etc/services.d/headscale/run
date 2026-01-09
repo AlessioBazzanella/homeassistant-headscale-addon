@@ -1,0 +1,10 @@
+#!/command/with-contenv bashio
+# shellcheck shell=bash
+# ==============================================================================
+# Home Assistant Community Add-on: Headscale
+# Runs the Headscale server
+# ==============================================================================
+
+# Run the Headscale server
+bashio::log.info 'Starting the Headscale server...'
+exec headscale serve
