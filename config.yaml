@@ -1,6 +1,6 @@
 ---
 name: "Headscale"
-version: "0.1.0"
+version: "0.2.0"
 slug: "headscale"
 description: "Headscale is an open source, self-hosted implementation of the Tailscale control server"
 url: https://headscale.net/
@@ -19,7 +19,7 @@ ports_description:
 map:
   - type: addon_config
     path: /etc/headscale
-    read_only: False
+    read_only: false
   - type: data
     path: /var/lib/headscale
 backup_exclude:

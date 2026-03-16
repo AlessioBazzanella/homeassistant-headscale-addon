@@ -1,4 +1,4 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/base:18.1.0
+ARG BUILD_FROM=ghcr.io/hassio-addons/debian-base:9.2.0
 
 ###############################################################################
 # Build the actual add-on.
@@ -6,12 +6,29 @@ ARG BUILD_FROM=ghcr.io/hassio-addons/base:18.1.0
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
+# Setup base system
+ARG BUILD_ARCH="amd64"
+ARG HEADSCALE_VERSION="v0.26.1"
+# hadolint ignore=SC2181, DL3008
 RUN \
-    apk add --no-cache \
-        headscale=0.26.1-r1
+    apt-get update \
+    && if [[ "${BUILD_ARCH}" = "aarch64" ]]; then ARCH="arm64"; fi \
+    && if [[ "${BUILD_ARCH}" = "amd64" ]]; then ARCH="amd64"; fi \
+    && curl -J -L -o /tmp/headscale.deb \
+        "https://github.com/juanfont/headscale/releases/download/${HEADSCALE_VERSION}/headscale_${HEADSCALE_VERSION#v}_linux_${ARCH}.deb" \
+    && dpkg -i --force-confdef --force-confold /tmp/headscale.deb \
+    && rm -fr \
+        /root/.cache \
+        #/tmp/* \
+        /var/{cache,log}/* \
+        /var/lib/apt/lists/*
 
 # Copy root filesystem
 COPY rootfs /
+
+# Health check
+HEALTHCHECK \
+   CMD curl --fail http://127.0.0.1:8080/health || exit 1
 
 # Build arguments
 ARG BUILD_ARCH
