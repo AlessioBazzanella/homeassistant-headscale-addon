@@ -8,7 +8,7 @@ FROM ${BUILD_FROM}
 
 # Setup base system
 ARG BUILD_ARCH="amd64"
-ARG HEADSCALE_VERSION="v0.27.1"
+ARG HEADSCALE_VERSION="v0.28.0"
 # hadolint ignore=SC2181, DL3008
 RUN \
     apt-get update \

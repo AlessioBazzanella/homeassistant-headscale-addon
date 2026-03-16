@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.28.0 (2026-03-16)
+
+- Update to version 0.28.0 from juanfont/headscale (changelog : https://github.com/juanfont/headscale/releases/tag/v0.28.0)
+
 ## 0.27.1 (2026-03-16)
 
 - Update to version 0.27.1 from juanfont/headscale (changelog : https://github.com/juanfont/headscale/releases/tag/v0.27.1)
