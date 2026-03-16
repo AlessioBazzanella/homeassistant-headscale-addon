@@ -9,14 +9,29 @@ FROM ${BUILD_FROM}
 # Setup base system
 ARG BUILD_ARCH="amd64"
 ARG HEADSCALE_VERSION="v0.28.0"
+ARG HEADPLANE_VERSION="v0.6.2"
 # hadolint ignore=SC2181, DL3008
 RUN \
     apt-get update \
+    \
+    && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash \
+    && \. "$HOME/.nvm/nvm.sh" \
+    && nvm install v22.22.1 \
+    && npm install -g pnpm \
+    \
     && if [[ "${BUILD_ARCH}" = "aarch64" ]]; then ARCH="arm64"; fi \
     && if [[ "${BUILD_ARCH}" = "amd64" ]]; then ARCH="amd64"; fi \
     && curl -J -L -o /tmp/headscale.deb \
         "https://github.com/juanfont/headscale/releases/download/${HEADSCALE_VERSION}/headscale_${HEADSCALE_VERSION#v}_linux_${ARCH}.deb" \
     && dpkg -i --force-confdef --force-confold /tmp/headscale.deb \
+    \
+    && curl -J -L -o /tmp/headplane.tar.gz \
+        "https://github.com/tale/headplane/archive/refs/tags/${HEADPLANE_VERSION}.tar.gz" \
+    && tar -xzf /tmp/headplane.tar.gz -C /tmp \
+    && cd /tmp/headplane-${HEADPLANE_VERSION#v} \
+    # && pnpm install \
+    # && pnpm build \
+    
     && rm -fr \
         /root/.cache \
         #/tmp/* \
