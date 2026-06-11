@@ -1,6 +1,6 @@
 ---
 name: "Headscale"
-version: "0.28.0.1"
+version: "0.28.0.2"
 slug: "headscale"
 description: "Headscale is an open source, self-hosted implementation of the Tailscale control server"
 url: https://headscale.net/

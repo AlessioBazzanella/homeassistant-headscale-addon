@@ -16,6 +16,11 @@ readonly CONFIG='/etc/headscale/config.yaml'
 readonly RENDER='/tmp/headscale-config.rendered.yaml'
 readonly BASELINE='/data/last_rendered_config.yaml'
 readonly OVERRIDES='/data/headplane_overrides.yaml'
+readonly OPTIONS='/tmp/options.json'
+
+# Recent Supervisors no longer write /data/options.json: fetch the add-on
+# options through the Supervisor API, the same way bashio itself does.
+bashio::addon.config > "${OPTIONS}"
 
 # Headscale's CLI talks to the server over this unix socket; /run is a
 # tmpfs, so the directory must be recreated on every container start.
@@ -35,7 +40,7 @@ fi
 
 bashio::log.info "Generating Headscale configuration: ${CONFIG}"
 tempio \
-    -conf /data/options.json \
+    -conf "${OPTIONS}" \
     -template /usr/share/tempio/headscale.config.gtpl \
     -out "${RENDER}"
 
@@ -94,7 +99,7 @@ if bashio::config.true 'headplane_enabled'; then
     fi
 
     tempio \
-        -conf /data/options.json \
+        -conf "${OPTIONS}" \
         -template /usr/share/tempio/headplane.config.gtpl \
         -out /etc/headplane/config.yaml
 

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.28.0.2 (2026-06-11)
+
+- Fix startup failure on recent Supervisors: read the add-on options through the Supervisor API instead of `/data/options.json`, which is no longer provided
+
 ## 0.28.0.1 (2026-06-11)
 
 - Generate the Headscale configuration automatically from the add-on options (server URL, IP prefixes and allocation strategy, log level, ACL policy mode/path, optional OpenID Connect section)
