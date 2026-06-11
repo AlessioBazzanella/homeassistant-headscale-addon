@@ -62,9 +62,10 @@ modificando direttamente `config.yaml` nella cartella di configurazione.
 Così c'è un'unica fonte di modifica e nessun rischio di conflitto con la UI.
 
 Le modifiche a queste chiavi sopravvivono alla rigenerazione: a ogni avvio
-vengono confrontate col config generato all'avvio precedente, salvate in
-`/data/headplane_overrides.yaml` e riapplicate. Riportare una chiave al suo
-valore di default rimuove l'override. I record DNS extra vivono in
+vengono confrontate col config generato all'avvio precedente, salvate come
+override nella directory dati persistente (`/var/lib/headscale`, inclusa
+nei backup) e riapplicate. Riportare una chiave al suo valore di default
+rimuove l'override. I record DNS extra vivono in
 `dns_records.json` (referenziato via `dns.extra_records_path`): Headplane ci
 scrive e Headscale li ricarica a caldo, senza riavvio.
 

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.28.0.3 (2026-06-11)
+
+- Fix startup failure: store add-on state (render baseline, Headplane overrides, cookie secret) in `/var/lib/headscale` — `/data` is not mounted when the data map uses a custom path
+
 ## 0.28.0.2 (2026-06-11)
 
 - Fix startup failure on recent Supervisors: read the add-on options through the Supervisor API instead of `/data/options.json`, which is no longer provided

@@ -8,14 +8,17 @@
 # OIDC-restriction keys are not exposed as options: they are owned by
 # Headplane (or by manual edits to the config file). On each start the live
 # config is diffed against the baseline rendered at the previous start; the
-# differences are stored in /data/headplane_overrides.yaml and re-applied on
-# top of the fresh render. A key set back to its rendered value drops its
-# override, so reverting to defaults works too.
+# differences are stored in the persistent data dir and re-applied on top of
+# the fresh render. A key set back to its rendered value drops its override,
+# so reverting to defaults works too.
 # ==============================================================================
+# /var/lib/headscale is the add-on's persistent data mapping ("data" map in
+# config.yaml); /data itself is not mounted when the map uses a custom path.
+readonly DATA='/var/lib/headscale'
 readonly CONFIG='/etc/headscale/config.yaml'
 readonly RENDER='/tmp/headscale-config.rendered.yaml'
-readonly BASELINE='/data/last_rendered_config.yaml'
-readonly OVERRIDES='/data/headplane_overrides.yaml'
+readonly BASELINE="${DATA}/.last_rendered_config.yaml"
+readonly OVERRIDES="${DATA}/.headplane_overrides.yaml"
 readonly OPTIONS='/tmp/options.json'
 
 # Recent Supervisors no longer write /data/options.json: fetch the add-on
@@ -90,12 +93,12 @@ cp "${RENDER}" "${BASELINE}"
 # ------------------------------------------------------------------------------
 if bashio::config.true 'headplane_enabled'; then
     bashio::log.info 'Generating Headplane configuration: /etc/headplane/config.yaml'
-    mkdir -p /etc/headplane /data/headplane
+    mkdir -p /etc/headplane "${DATA}/headplane"
 
     # Headplane wants a stable 32-char secret to sign its session cookies
-    if ! bashio::fs.file_exists /data/headplane_cookie_secret; then
+    if ! bashio::fs.file_exists "${DATA}/.headplane_cookie_secret"; then
         head -c 100 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' \
-            | head -c 32 > /data/headplane_cookie_secret
+            | head -c 32 > "${DATA}/.headplane_cookie_secret"
     fi
 
     tempio \
@@ -103,7 +106,7 @@ if bashio::config.true 'headplane_enabled'; then
         -template /usr/share/tempio/headplane.config.gtpl \
         -out /etc/headplane/config.yaml
 
-    cookie_secret=$(< /data/headplane_cookie_secret)
+    cookie_secret=$(< "${DATA}/.headplane_cookie_secret")
     cookie_secure=false
     if [[ "$(bashio::config 'headplane_base_url')" == https://* ]]; then
         cookie_secure=true

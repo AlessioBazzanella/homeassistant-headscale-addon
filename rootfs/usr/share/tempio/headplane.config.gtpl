@@ -9,7 +9,7 @@ server:
   # cookie_secret and cookie_secure are injected by the init script
   cookie_secret: ""
   cookie_secure: false
-  data_path: /data/headplane
+  data_path: /var/lib/headscale/headplane
 
 headscale:
   url: "http://127.0.0.1:8080"
