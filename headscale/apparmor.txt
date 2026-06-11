@@ -34,10 +34,9 @@ profile headscale flags=(attach_disconnected,mediate_deleted) {
   /tmp/{,**} rwk,
   /dev/tty rw,
 
-  # Add-on configuration and persistent data
-  /etc/** r,
-  /etc/headscale/{,**} rw,
-  /etc/headplane/{,**} rw,
+  # Container /etc is ephemeral (image layer): the base-image init scripts
+  # write/symlink there (timezone) and we generate configs in it.
+  /etc/{,**} rwlk,
   /var/lib/headscale/{,**} rwk,
   /usr/share/** r,
 
@@ -45,7 +44,4 @@ profile headscale flags=(attach_disconnected,mediate_deleted) {
   /opt/headplane/{,**} r,
   /opt/nodejs/** rix,
 
-  # Base-image init (timezone)
-  /etc/localtime rw,
-  /etc/timezone rw,
 }
