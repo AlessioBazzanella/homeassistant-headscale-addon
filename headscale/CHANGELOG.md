@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.28.0.7 (2026-06-11)
+
+- Fix AppArmor profile again: s6-rc executes compiled service scripts from `/run/s6-rc` too — grant inherit-exec on the whole `/run` tree
+
 ## 0.28.0.6 (2026-06-11)
 
 - Fix AppArmor profile: allow executing the s6 supervision tree from /run (0.28.0.5 failed to start)
