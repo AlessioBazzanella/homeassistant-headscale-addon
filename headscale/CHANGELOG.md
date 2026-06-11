@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.28.0.6 (2026-06-11)
+
+- Fix AppArmor profile: allow executing the s6 supervision tree from /run (0.28.0.5 failed to start)
+
 ## 0.28.0.5 (2026-06-11)
 
 - Ship an AppArmor profile (security rating 5 → 6)
