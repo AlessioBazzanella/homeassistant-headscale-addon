@@ -1,0 +1,48 @@
+#include <tunables/global>
+
+profile headscale flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+
+  # Networking (headscale :8080/:9090/:50443, headplane :3000, OIDC egress)
+  network,
+  unix,
+
+  # Headplane reloads headscale with SIGHUP after config changes and finds
+  # its PID by scanning /proc
+  signal,
+  ptrace (read),
+  @{PROC}/{,**} r,
+  /sys/** r,
+
+  # S6-Overlay / bashio
+  /init rix,
+  /package/** rix,
+  /command/** rix,
+  /bin/** rix,
+  /usr/bin/** rix,
+  /usr/lib/bashio/** rix,
+  /etc/s6/** rix,
+  /etc/services.d/** rix,
+  /etc/cont-init.d/** rix,
+  /run/{,**} rwk,
+  /var/run/{,**} rwk,
+  /tmp/{,**} rwk,
+  /dev/tty rw,
+
+  # Add-on configuration and persistent data
+  /etc/headscale/{,**} rw,
+  /etc/headplane/{,**} rw,
+  /var/lib/headscale/{,**} rwk,
+  /usr/share/tempio/** r,
+
+  # Headplane application and Node.js runtime
+  /opt/headplane/{,**} r,
+  /opt/nodejs/** rix,
+
+  # TLS trust store and base-image init (timezone)
+  /etc/ssl/{,**} r,
+  /etc/localtime rw,
+  /etc/timezone rw,
+  /etc/machine-id r,
+}

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.28.0.5 (2026-06-11)
+
+- Ship an AppArmor profile (security rating 5 → 6)
+
 ## 0.28.0.4 (2026-06-11)
 
 - OIDC login for the Headplane dashboard (`headplane_oidc_enabled`): reuses headscale's OIDC settings unless overridden via `headplane_oidc_*`; the required Headscale API key is issued automatically at startup
