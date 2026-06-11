@@ -12,10 +12,12 @@ arch:
   - amd64
 ports:
   8080/tcp: 8080
+  3000/tcp: 3000
   9090/tcp: null
   50443/tcp: null
 ports_description:
   8080/tcp: Headscale API
+  3000/tcp: Headplane dashboard
   9090/tcp: Headscale Metrics
   50443/tcp: Headscale gRPC (remote CLI, requires valid TLS certificates)
 map:
@@ -40,6 +42,8 @@ options:
     - "profile"
     - "email"
   oidc_pkce_enabled: false
+  headplane_enabled: false
+  headplane_base_url: "http://homeassistant.local:3000"
 schema:
   server_url: url
   log_level: list(trace|debug|info|warn|error)
@@ -57,3 +61,5 @@ schema:
   oidc_scope:
     - str
   oidc_pkce_enabled: bool
+  headplane_enabled: bool
+  headplane_base_url: url

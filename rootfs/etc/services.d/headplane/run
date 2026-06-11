@@ -1,0 +1,17 @@
+#!/command/with-contenv bashio
+# shellcheck shell=bash
+# ==============================================================================
+# Home Assistant Community Add-on: Headscale
+# Runs the Headplane dashboard (optional)
+# ==============================================================================
+
+if ! bashio::config.true 'headplane_enabled'; then
+    bashio::log.info "Headplane is disabled ('headplane_enabled: false')"
+    s6-svc -O "$(pwd)"
+    exit 0
+fi
+
+bashio::log.info 'Starting Headplane...'
+cd /opt/headplane \
+    || bashio::exit.nok 'Headplane application directory is missing'
+exec /opt/nodejs/bin/node build/server/index.js

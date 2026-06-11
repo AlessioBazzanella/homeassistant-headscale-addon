@@ -1,4 +1,12 @@
 ARG BUILD_FROM=ghcr.io/hassio-addons/debian-base:9.2.0
+ARG HEADPLANE_VERSION="0.6.3"
+
+###############################################################################
+# Official Headplane image, used as a source for the app and the Node runtime
+# (its final stage is distroless/nodejs24-debian13, same libc as our base).
+###############################################################################
+# hadolint ignore=DL3006
+FROM ghcr.io/tale/headplane:${HEADPLANE_VERSION} AS headplane
 
 ###############################################################################
 # Build the actual add-on.
@@ -26,6 +34,10 @@ RUN \
         /tmp/* \
         /var/{cache,log}/* \
         /var/lib/apt/lists/*
+
+# Headplane dashboard (Node.js runtime + self-contained app build)
+COPY --from=headplane /nodejs /opt/nodejs
+COPY --from=headplane /app /opt/headplane
 
 # Copy root filesystem
 COPY rootfs /

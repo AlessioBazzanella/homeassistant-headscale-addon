@@ -33,6 +33,23 @@ Opzioni aggiuntive: `oidc_expiry` (durata della sessione, es. `180d`),
 (`allowed_domains`, `allowed_users`, `allowed_groups`) si gestiscono da
 Headplane o modificando il file (vedi sotto).
 
+### Headplane (dashboard integrata)
+
+Con `headplane_enabled: true` l'add-on avvia anche
+[Headplane](https://github.com/tale/headplane), una web UI completa per
+Headscale, raggiungibile sulla porta 3000 al percorso `/admin`
+(es. `http://homeassistant.local:3000/admin`). Da lì si gestiscono
+macchine, utenti, ACL e impostazioni DNS.
+
+- Login: con una API key di Headscale, da creare dal terminale dell'add-on
+  con `headscale apikeys create --expiration 90d`.
+- `headplane_base_url` deve corrispondere all'URL con cui si raggiunge la
+  dashboard (serve per cookie e redirect); con un URL `https://` i cookie
+  vengono marcati secure automaticamente.
+- Headscale gira nello stesso container: Headplane applica le modifiche
+  alla configurazione ricaricandolo via SIGHUP (integrazione `proc`),
+  senza permessi speciali.
+
 ### DNS e restrizioni OIDC (Headplane o modifica manuale)
 
 Le impostazioni DNS (`dns.magic_dns`, `dns.base_domain`,

@@ -62,3 +62,15 @@ configuration:
   oidc_pkce_enabled:
     name: OIDC PKCE
     description: Enable PKCE (Proof Key for Code Exchange) for the OIDC flow.
+  headplane_enabled:
+    name: Headplane dashboard
+    description: >-
+      Run the bundled Headplane web UI (port 3000, path /admin) to manage
+      Headscale: machines, users, ACLs, DNS settings. Log in with a Headscale
+      API key ("headscale apikeys create" from the add-on terminal).
+  headplane_base_url:
+    name: Headplane base URL
+    description: >-
+      Public URL used to reach the Headplane dashboard (used for cookies and
+      redirects), e.g. http://homeassistant.local:3000 or the reverse-proxy
+      URL in front of it.

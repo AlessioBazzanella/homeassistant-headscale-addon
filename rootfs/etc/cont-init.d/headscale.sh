@@ -79,3 +79,30 @@ fi
 yq eval-all '. as $item ireduce ({}; . * $item)' \
     "${RENDER}" "${OVERRIDES}" > "${CONFIG}"
 cp "${RENDER}" "${BASELINE}"
+
+# ------------------------------------------------------------------------------
+# Headplane dashboard
+# ------------------------------------------------------------------------------
+if bashio::config.true 'headplane_enabled'; then
+    bashio::log.info 'Generating Headplane configuration: /etc/headplane/config.yaml'
+    mkdir -p /etc/headplane /data/headplane
+
+    # Headplane wants a stable 32-char secret to sign its session cookies
+    if ! bashio::fs.file_exists /data/headplane_cookie_secret; then
+        head -c 100 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' \
+            | head -c 32 > /data/headplane_cookie_secret
+    fi
+
+    tempio \
+        -conf /data/options.json \
+        -template /usr/share/tempio/headplane.config.gtpl \
+        -out /etc/headplane/config.yaml
+
+    cookie_secret=$(< /data/headplane_cookie_secret)
+    cookie_secure=false
+    if [[ "$(bashio::config 'headplane_base_url')" == https://* ]]; then
+        cookie_secure=true
+    fi
+    yq -i ".server.cookie_secret = \"${cookie_secret}\"
+         | .server.cookie_secure = ${cookie_secure}" /etc/headplane/config.yaml
+fi
