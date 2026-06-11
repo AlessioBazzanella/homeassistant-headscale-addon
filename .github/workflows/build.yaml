@@ -7,11 +7,7 @@ on:
   push:
     branches: [main]
     paths:
-      - config.yaml
-      - build.yaml
-      - Dockerfile
-      - rootfs/**
-      - translations/**
+      - headscale/**
       - .github/workflows/build.yaml
 
 jobs:
@@ -34,7 +30,7 @@ jobs:
         id: info
         uses: home-assistant/actions/helpers/info@master
         with:
-          path: "."
+          path: "./headscale"
 
       # The info helper outputs values with literal YAML quotes; passing them
       # through bash assignments strips the quotes.
@@ -81,7 +77,7 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
           container-registry-password: ${{ secrets.GITHUB_TOKEN }}
-          context: "."
+          context: "./headscale"
           image: ${{ matrix.image }}
           image-tags: |
             ${{ needs.prepare.outputs.version }}
