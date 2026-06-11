@@ -4,7 +4,7 @@ version: "0.28.0.1"
 slug: "headscale"
 description: "Headscale is an open source, self-hosted implementation of the Tailscale control server"
 url: https://headscale.net/
-codenotary: alessio.bazzanella@me.com
+image: "ghcr.io/alessiobazzanella/addon-headscale"
 webui: "http://[HOST]:[PORT:8080]"
 init: false
 arch:
