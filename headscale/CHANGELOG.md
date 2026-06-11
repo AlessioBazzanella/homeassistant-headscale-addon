@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.28.0.10 (2026-06-11)
+
+- Fix AppArmor profile: allow executable memory mapping of Headplane's bundled native modules (libsql)
+
 ## 0.28.0.9 (2026-06-11)
 
 - Fix AppArmor profile: allow the dpkg/debconf toolchain used by the base-image timezone init (`dpkg-reconfigure tzdata` in /usr/sbin)

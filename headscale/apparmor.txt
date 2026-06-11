@@ -49,8 +49,9 @@ profile headscale flags=(attach_disconnected,mediate_deleted) {
   /var/cache/debconf/{,**} rwk,
   /var/log/{,**} rw,
 
-  # Headplane application and Node.js runtime
-  /opt/headplane/{,**} r,
-  /opt/nodejs/** rix,
+  # Headplane application and Node.js runtime ("m" lets node dlopen/mmap the
+  # native modules bundled with the app, e.g. libsql's index.node)
+  /opt/headplane/{,**} mr,
+  /opt/nodejs/** mrix,
 
 }
