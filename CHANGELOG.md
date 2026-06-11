@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.28.0.1 (2026-06-11)
+
+- Generate the Headscale configuration automatically from the add-on options (server URL, IP prefixes and allocation strategy, log level, ACL policy mode/path, optional OpenID Connect section)
+- DNS settings and OIDC access restrictions are not add-on options: they are managed from a Headplane dashboard or by editing the config file, and such changes are preserved across config regenerations (stored as overrides in `/data`); extra DNS records live in a hot-reloaded `dns_records.json`
+- Fix image cleanup in Dockerfile (apt lists and downloaded .deb were not removed)
+
 ## 0.28.0 (2026-03-16)
 
 - Update to version 0.28.0 from juanfont/headscale (changelog : https://github.com/juanfont/headscale/releases/tag/v0.28.0)

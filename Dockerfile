@@ -9,6 +9,7 @@ FROM ${BUILD_FROM}
 # Setup base system
 ARG BUILD_ARCH="amd64"
 ARG HEADSCALE_VERSION="v0.28.0"
+ARG YQ_VERSION="v4.53.3"
 # hadolint ignore=SC2181, DL3008
 RUN \
     apt-get update \
@@ -17,9 +18,12 @@ RUN \
     && curl -J -L -o /tmp/headscale.deb \
         "https://github.com/juanfont/headscale/releases/download/${HEADSCALE_VERSION}/headscale_${HEADSCALE_VERSION#v}_linux_${ARCH}.deb" \
     && dpkg -i --force-confdef --force-confold /tmp/headscale.deb \
+    && curl -J -L -o /usr/bin/yq \
+        "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_${ARCH}" \
+    && chmod +x /usr/bin/yq \
     && rm -fr \
         /root/.cache \
-        #/tmp/* \
+        /tmp/* \
         /var/{cache,log}/* \
         /var/lib/apt/lists/*
 

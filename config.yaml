@@ -1,11 +1,11 @@
 ---
 name: "Headscale"
-version: "0.28.0"
+version: "0.28.0.1"
 slug: "headscale"
 description: "Headscale is an open source, self-hosted implementation of the Tailscale control server"
 url: https://headscale.net/
 codenotary: alessio.bazzanella@me.com
-webui: "[PROTO:ssl]://[HOST]:[PORT:8080]"
+webui: "http://[HOST]:[PORT:8080]"
 init: false
 arch:
   - aarch64
@@ -13,9 +13,11 @@ arch:
 ports:
   8080/tcp: 8080
   9090/tcp: null
+  50443/tcp: null
 ports_description:
   8080/tcp: Headscale API
   9090/tcp: Headscale Metrics
+  50443/tcp: Headscale gRPC (remote CLI, requires valid TLS certificates)
 map:
   - type: addon_config
     path: /etc/headscale
@@ -24,3 +26,34 @@ map:
     path: /var/lib/headscale
 backup_exclude:
   - "*/logs"
+options:
+  server_url: "http://homeassistant.local:8080"
+  log_level: "info"
+  ipv4_prefix: "100.64.0.0/10"
+  ipv6_prefix: "fd7a:115c:a1e0::/48"
+  address_allocation: "sequential"
+  ephemeral_node_inactivity_timeout: "30m"
+  policy_mode: "file"
+  oidc_enabled: false
+  oidc_scope:
+    - "openid"
+    - "profile"
+    - "email"
+  oidc_pkce_enabled: false
+schema:
+  server_url: url
+  log_level: list(trace|debug|info|warn|error)
+  ipv4_prefix: str
+  ipv6_prefix: str
+  address_allocation: list(sequential|random)
+  ephemeral_node_inactivity_timeout: str
+  policy_mode: list(file|database)
+  policy_path: str?
+  oidc_enabled: bool
+  oidc_issuer: url?
+  oidc_client_id: str?
+  oidc_client_secret: password?
+  oidc_expiry: str?
+  oidc_scope:
+    - str
+  oidc_pkce_enabled: bool
