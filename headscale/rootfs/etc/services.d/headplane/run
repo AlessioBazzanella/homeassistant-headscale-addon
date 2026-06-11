@@ -11,6 +11,30 @@ if ! bashio::config.true 'headplane_enabled'; then
     exit 0
 fi
 
+# With OIDC login, Headplane needs its own Headscale API key to act on
+# behalf of the logged-in users. Issue one (once) when headscale is up and
+# inject it into the generated configuration.
+if bashio::config.true 'headplane_oidc_enabled'; then
+    readonly KEY_FILE='/var/lib/headscale/.headplane_api_key'
+
+    bashio::log.info 'Waiting for Headscale before starting Headplane (OIDC)...'
+    for _ in $(seq 1 60); do
+        curl -sf http://127.0.0.1:8080/health > /dev/null && break
+        sleep 1
+    done
+    if ! curl -sf http://127.0.0.1:8080/health > /dev/null; then
+        bashio::exit.nok 'Headscale did not become healthy, not starting Headplane'
+    fi
+
+    if [[ ! -s "${KEY_FILE}" ]]; then
+        bashio::log.info 'Issuing a Headscale API key for Headplane (expires in 10 years)'
+        headscale apikeys create --expiration 3650d \
+            | tail -n1 | tr -d '[:space:]' > "${KEY_FILE}"
+    fi
+    yq -i ".oidc.headscale_api_key = \"$(< "${KEY_FILE}")\"" \
+        /etc/headplane/config.yaml
+fi
+
 bashio::log.info 'Starting Headplane...'
 cd /opt/headplane \
     || bashio::exit.nok 'Headplane application directory is missing'

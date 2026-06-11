@@ -41,6 +41,21 @@ if bashio::config.true 'oidc_enabled'; then
     bashio::config.require 'oidc_client_secret' "'oidc_enabled' is set to true"
 fi
 
+if bashio::config.true 'headplane_oidc_enabled'; then
+    if ! bashio::config.true 'headplane_enabled'; then
+        bashio::exit.nok \
+            "'headplane_oidc_enabled' requires 'headplane_enabled: true'"
+    fi
+    # Credentials come from the headplane_oidc_* options or, when unset,
+    # fall back to headscale's oidc_* options.
+    if ! bashio::config.has_value 'headplane_oidc_issuer' \
+        && ! bashio::config.true 'oidc_enabled'; then
+        bashio::exit.nok \
+            "'headplane_oidc_enabled' needs the headplane_oidc_* options" \
+            "or 'oidc_enabled: true' to borrow headscale's OIDC settings"
+    fi
+fi
+
 bashio::log.info "Generating Headscale configuration: ${CONFIG}"
 tempio \
     -conf "${OPTIONS}" \

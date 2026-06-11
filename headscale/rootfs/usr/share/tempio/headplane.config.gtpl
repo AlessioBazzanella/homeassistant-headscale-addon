@@ -22,3 +22,17 @@ headscale:
 integration:
   proc:
     enabled: true
+{{- if .headplane_oidc_enabled }}
+
+# Unset headplane_oidc_* options fall back to headscale's OIDC settings
+# (the recommended setup: same identity provider client for both).
+oidc:
+  issuer: "{{ if .headplane_oidc_issuer }}{{ .headplane_oidc_issuer }}{{ else }}{{ .oidc_issuer }}{{ end }}"
+  client_id: "{{ if .headplane_oidc_client_id }}{{ .headplane_oidc_client_id }}{{ else }}{{ .oidc_client_id }}{{ end }}"
+  client_secret: "{{ if .headplane_oidc_client_secret }}{{ .headplane_oidc_client_secret }}{{ else }}{{ .oidc_client_secret }}{{ end }}"
+  scope: "{{ range $i, $s := .oidc_scope }}{{ if $i }} {{ end }}{{ $s }}{{ end }}"
+  use_pkce: {{ .oidc_pkce_enabled }}
+  disable_api_key_login: false
+  # Injected by the headplane service script once headscale is up
+  headscale_api_key: ""
+{{- end }}

@@ -74,3 +74,20 @@ configuration:
       Public URL used to reach the Headplane dashboard (used for cookies and
       redirects), e.g. http://homeassistant.local:3000 or the reverse-proxy
       URL in front of it.
+  headplane_oidc_enabled:
+    name: Headplane OIDC login
+    description: >-
+      Log in to the Headplane dashboard via OpenID Connect. Unless overridden
+      below, it reuses headscale's OIDC settings (recommended: same identity
+      provider client). The provider must allow the redirect URI
+      <base URL>/admin/oidc/callback. API key login stays available as a
+      fallback.
+  headplane_oidc_issuer:
+    name: Headplane OIDC issuer
+    description: Override the OIDC issuer URL for Headplane only.
+  headplane_oidc_client_id:
+    name: Headplane OIDC client ID
+    description: Override the OIDC client ID for Headplane only.
+  headplane_oidc_client_secret:
+    name: Headplane OIDC client secret
+    description: Override the OIDC client secret for Headplane only.

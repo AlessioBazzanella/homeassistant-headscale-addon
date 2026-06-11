@@ -42,13 +42,32 @@ Headscale, raggiungibile sulla porta 3000 al percorso `/admin`
 macchine, utenti, ACL e impostazioni DNS.
 
 - Login: con una API key di Headscale, da creare dal terminale dell'add-on
-  con `headscale apikeys create --expiration 90d`.
+  con `headscale apikeys create --expiration 90d`, oppure via OpenID
+  Connect (vedi sotto).
 - `headplane_base_url` deve corrispondere all'URL con cui si raggiunge la
   dashboard (serve per cookie e redirect); con un URL `https://` i cookie
   vengono marcati secure automaticamente.
 - Headscale gira nello stesso container: Headplane applica le modifiche
   alla configurazione ricaricandolo via SIGHUP (integrazione `proc`),
   senza permessi speciali.
+
+#### Login OIDC per Headplane
+
+Con `headplane_oidc_enabled: true` il login alla dashboard avviene tramite
+OpenID Connect. Se le opzioni `headplane_oidc_issuer` / `_client_id` /
+`_client_secret` non sono valorizzate, vengono riusate le impostazioni
+OIDC di headscale (è il setup raccomandato: stesso client sull'identity
+provider). Richiede:
+
+- `headplane_enabled: true` (e, se si riusano le credenziali,
+  `oidc_enabled: true`);
+- sull'identity provider, autorizzare il redirect URI
+  `<headplane_base_url>/admin/oidc/callback`.
+
+Al primo avvio l'add-on genera automaticamente una API key di Headscale
+dedicata a Headplane (scadenza 10 anni, salvata nella directory dati): è
+ciò che Headplane usa per parlare con l'API quando gli utenti accedono via
+OIDC. Il login con API key resta disponibile come ripiego.
 
 ### DNS e restrizioni OIDC (Headplane o modifica manuale)
 
