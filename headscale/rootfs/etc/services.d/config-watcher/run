@@ -1,0 +1,30 @@
+#!/command/with-contenv bashio
+# shellcheck shell=bash
+# ==============================================================================
+# Home Assistant Community Add-on: Headscale
+# Restarts headscale when Headplane changes settings that headscale only
+# reads at startup: SIGHUP reloads the ACL policy only, so every dns.* and
+# oidc.* change needs a service restart to take effect. Extra DNS records
+# live in a separate hot-reloaded file and never touch these keys.
+# ==============================================================================
+readonly CONFIG='/etc/headscale/config.yaml'
+readonly RESTART_KEYS='[.dns, .oidc]'
+
+snapshot() {
+    yq -o=json -I=0 "${RESTART_KEYS}" "${CONFIG}" 2>/dev/null
+}
+
+last=$(snapshot)
+
+while true; do
+    sleep 10
+    current=$(snapshot)
+    # Empty snapshot = config mid-rewrite, retry on the next tick
+    if [[ -n "${current}" && -n "${last}" && "${current}" != "${last}" ]]; then
+        bashio::log.notice \
+            'DNS/OIDC settings changed: restarting Headscale to apply them'
+        touch /run/headscale-intentional-restart
+        s6-svc -r /run/service/headscale
+    fi
+    last="${current:-${last}}"
+done

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.28.0.11 (2026-06-12)
+
+- Automatically restart headscale (service-only, the add-on stays up) when Headplane changes settings that headscale reads only at startup, e.g. renaming the tailnet (`dns.base_domain`)
+
 ## 0.28.0.10 (2026-06-11)
 
 - Fix AppArmor profile: allow executable memory mapping of Headplane's bundled native modules (libsql)

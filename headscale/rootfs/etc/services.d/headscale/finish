@@ -9,6 +9,14 @@ readonly exit_code_service="${1}"
 readonly exit_code_signal="${2}"
 readonly service="HEADSCALE"
 
+# Deliberate restart requested by the config-watcher service: let s6
+# restart headscale instead of taking the whole container down.
+if [[ -e /run/headscale-intentional-restart ]]; then
+  rm -f /run/headscale-intentional-restart
+  bashio::log.info 'Restarting Headscale to apply configuration changes...'
+  exit 0
+fi
+
 bashio::log.info \
   "Service ${service} exited with code ${exit_code_service}" \
   "(by signal ${exit_code_signal})"

@@ -51,6 +51,14 @@ macchine, utenti, ACL e impostazioni DNS.
   alla configurazione ricaricandolo via SIGHUP (integrazione `proc`),
   senza permessi speciali.
 
+Come vengono applicate le modifiche fatte da Headplane:
+
+| Modifica | Applicazione |
+|---|---|
+| Record DNS extra | A caldo, immediata (`dns_records.json` ricaricato da headscale) |
+| ACL | Immediata (API headscale / SIGHUP) |
+| Impostazioni DNS (nameserver, split DNS, override, base domain, MagicDNS) e restrizioni OIDC | Riavvio automatico del solo servizio headscale entro ~10 secondi (l'add-on e Headplane restano su; i client si riconnettono da soli) |
+
 #### Login OIDC per Headplane
 
 Con `headplane_oidc_enabled: true` il login alla dashboard avviene tramite
