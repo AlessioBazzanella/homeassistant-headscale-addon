@@ -32,7 +32,7 @@ oidc:
   client_secret: "{{ if .headplane_oidc_client_secret }}{{ .headplane_oidc_client_secret }}{{ else }}{{ .oidc_client_secret }}{{ end }}"
   scope: "{{ range $i, $s := .oidc_scope }}{{ if $i }} {{ end }}{{ $s }}{{ end }}"
   use_pkce: {{ .oidc_pkce_enabled }}
-  disable_api_key_login: false
+  disable_api_key_login: {{ .headplane_oidc_disable_api_key_login }}
   # Injected by the headplane service script once headscale is up
   headscale_api_key: ""
 {{- end }}

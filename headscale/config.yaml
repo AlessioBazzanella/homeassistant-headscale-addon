@@ -1,6 +1,6 @@
 ---
 name: "Headscale"
-version: "0.28.0.13"
+version: "0.28.0.14"
 slug: "headscale"
 description: "Headscale is an open source, self-hosted implementation of the Tailscale control server"
 url: https://headscale.net/
@@ -45,6 +45,7 @@ options:
   headplane_enabled: false
   headplane_base_url: "http://homeassistant.local:3000"
   headplane_oidc_enabled: false
+  headplane_oidc_disable_api_key_login: false
 schema:
   server_url: url
   log_level: list(trace|debug|info|warn|error)
@@ -68,3 +69,4 @@ schema:
   headplane_oidc_issuer: url?
   headplane_oidc_client_id: str?
   headplane_oidc_client_secret: password?
+  headplane_oidc_disable_api_key_login: bool

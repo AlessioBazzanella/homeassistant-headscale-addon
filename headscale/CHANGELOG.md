@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.28.0.14 (2026-06-12)
+
+- New `headplane_oidc_disable_api_key_login` option to hide the API key login form on the Headplane dashboard when OIDC is enabled
+
 ## 0.28.0.13 (2026-06-12)
 
 - Add the add-on info page text (README), translate the documentation to English and add Italian translations for the configuration options (`translations/it.yaml`)

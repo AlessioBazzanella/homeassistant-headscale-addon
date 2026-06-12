@@ -97,3 +97,10 @@ configuration:
   headplane_oidc_client_secret:
     name: Client secret OIDC di Headplane
     description: Sovrascrive il client secret OIDC solo per Headplane.
+  headplane_oidc_disable_api_key_login:
+    name: Disabilita login con API key in Headplane
+    description: >-
+      Nasconde il form di login con API key nella dashboard Headplane,
+      lasciando l'OIDC come unico accesso. Attenzione: se l'identity
+      provider si rompe resti chiuso fuori finché non riporti questa
+      opzione a false e riavvii l'add-on.

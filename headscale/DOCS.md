@@ -77,7 +77,11 @@ It requires:
 On first start the add-on automatically issues a Headscale API key
 dedicated to Headplane (10-year expiration, stored in the data
 directory): it is what Headplane uses to talk to the API when users log
-in via OIDC. API key login remains available as a fallback.
+in via OIDC. API key login remains available as a fallback, unless you
+harden the dashboard with `headplane_oidc_disable_api_key_login: true` —
+in that case OIDC becomes the only way in, and if the identity provider
+breaks you must set the option back to `false` and restart the add-on
+to regain access.
 
 ### DNS and OIDC restrictions (Headplane or manual edits)
 
