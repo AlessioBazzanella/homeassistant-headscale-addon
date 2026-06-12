@@ -25,6 +25,16 @@ while true; do
             'DNS/OIDC settings changed: restarting Headscale to apply them'
         touch /run/headscale-intentional-restart
         s6-svc -r /run/service/headscale
+        if bashio::config.true 'headplane_enabled'; then
+            # Headplane caches headscale's PID at startup for the proc
+            # integration: once headscale is healthy again, restart
+            # Headplane too so it picks up the new PID.
+            for _ in $(seq 1 30); do
+                sleep 1
+                curl -sf http://127.0.0.1:8080/health > /dev/null && break
+            done
+            s6-svc -r /run/service/headplane
+        fi
     fi
     last="${current:-${last}}"
 done

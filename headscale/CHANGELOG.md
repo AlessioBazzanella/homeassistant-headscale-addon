@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.28.0.12 (2026-06-12)
+
+- Restart Headplane after the automatic headscale restart so its proc integration picks up the new PID (fixes `kill ESRCH` on subsequent SIGHUPs)
+
 ## 0.28.0.11 (2026-06-12)
 
 - Automatically restart headscale (service-only, the add-on stays up) when Headplane changes settings that headscale reads only at startup, e.g. renaming the tailnet (`dns.base_domain`)
