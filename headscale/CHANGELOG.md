@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.28.0.13 (2026-06-12)
+
+- Add the add-on info page text (README), translate the documentation to English and add Italian translations for the configuration options (`translations/it.yaml`)
+
 ## 0.28.0.12 (2026-06-12)
 
 - Restart Headplane after the automatic headscale restart so its proc integration picks up the new PID (fixes `kill ESRCH` on subsequent SIGHUPs)

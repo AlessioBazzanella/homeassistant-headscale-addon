@@ -1,119 +1,121 @@
 # Home Assistant Add-on: Headscale
 
-[Headscale](https://headscale.net/) è un'implementazione open source e
-self-hosted del control server di Tailscale.
+[Headscale](https://headscale.net/) is an open source, self-hosted
+implementation of the Tailscale control server.
 
-## Configurazione
+## Configuration
 
-All'avvio l'add-on genera automaticamente `/etc/headscale/config.yaml` a
-partire dalle opzioni qui sotto. Le modifiche manuali al file vengono
-sovrascritte a ogni riavvio.
+On startup the add-on automatically generates `/etc/headscale/config.yaml`
+from the options below. Manual edits to the file are overwritten on every
+restart — with one exception: the DNS settings and OIDC access
+restrictions, which are owned by Headplane or by the user and are
+preserved (see "DNS and OIDC restrictions" below).
 
-### Opzioni principali
+### Main options
 
-| Opzione | Default | Descrizione |
+| Option | Default | Description |
 |---|---|---|
-| `server_url` | `http://homeassistant.local:8080` | URL pubblico con cui i client raggiungono Headscale. Per usarlo fuori dalla LAN serve un dominio raggiungibile (tipicamente dietro reverse proxy con TLS). |
-| `log_level` | `info` | Livello di log (`trace`…`error`). |
-| `ipv4_prefix` / `ipv6_prefix` | `100.64.0.0/10` / `fd7a:115c:a1e0::/48` | Range da cui vengono assegnati gli indirizzi della tailnet. |
-| `address_allocation` | `sequential` | Strategia di assegnazione degli IP ai nuovi nodi (`sequential` o `random`). |
-| `ephemeral_node_inactivity_timeout` | `30m` | Tempo dopo il quale un nodo effimero inattivo viene rimosso. |
-| `policy_mode` | `file` | Dove sono salvate le ACL: `file` (file HuJSON, vedi `policy_path`) o `database` (gestite via API/CLI di Headscale). |
-| `policy_path` | — | (Opzionale, solo con `policy_mode: file`) percorso di un file ACL HuJSON, ad es. `/etc/headscale/acl.hujson`. Mettere il file nella cartella di configurazione dell'add-on. |
+| `server_url` | `http://homeassistant.local:8080` | Public URL clients use to reach Headscale. To use it outside the LAN you need a reachable domain (typically behind a TLS reverse proxy). |
+| `log_level` | `info` | Log verbosity (`trace`…`error`). |
+| `ipv4_prefix` / `ipv6_prefix` | `100.64.0.0/10` / `fd7a:115c:a1e0::/48` | Ranges tailnet addresses are allocated from. |
+| `address_allocation` | `sequential` | How IPs are assigned to new nodes (`sequential` or `random`). |
+| `ephemeral_node_inactivity_timeout` | `30m` | Time before an inactive ephemeral node is removed. |
+| `policy_mode` | `file` | Where ACLs are stored: `file` (HuJSON file, see `policy_path`) or `database` (managed via the Headscale API/CLI). |
+| `policy_path` | — | (Optional, `policy_mode: file` only) path to a HuJSON ACL file, e.g. `/etc/headscale/acl.hujson`. Place the file in the add-on configuration folder. |
 
-### OpenID Connect (opzionale)
+### OpenID Connect (optional)
 
-Con `oidc_enabled: true` l'autenticazione degli utenti è delegata a un
-identity provider OIDC. In tal caso `oidc_issuer`, `oidc_client_id` e
-`oidc_client_secret` sono obbligatori (l'add-on si rifiuta di partire se
-mancano).
+With `oidc_enabled: true` user authentication is delegated to an OIDC
+identity provider. In that case `oidc_issuer`, `oidc_client_id` and
+`oidc_client_secret` are required (the add-on refuses to start without
+them).
 
-Opzioni aggiuntive: `oidc_expiry` (durata della sessione, es. `180d`),
-`oidc_scope`, `oidc_pkce_enabled`. Le restrizioni di accesso
-(`allowed_domains`, `allowed_users`, `allowed_groups`) si gestiscono da
-Headplane o modificando il file (vedi sotto).
+Additional options: `oidc_expiry` (session duration, e.g. `180d`),
+`oidc_scope`, `oidc_pkce_enabled`. Access restrictions
+(`allowed_domains`, `allowed_users`, `allowed_groups`) are managed from
+Headplane or by editing the file (see below).
 
-### Headplane (dashboard integrata)
+### Headplane (bundled dashboard)
 
-Con `headplane_enabled: true` l'add-on avvia anche
-[Headplane](https://github.com/tale/headplane), una web UI completa per
-Headscale, raggiungibile sulla porta 3000 al percorso `/admin`
-(es. `http://homeassistant.local:3000/admin`). Da lì si gestiscono
-macchine, utenti, ACL e impostazioni DNS.
+With `headplane_enabled: true` the add-on also runs
+[Headplane](https://github.com/tale/headplane), a full web UI for
+Headscale, reachable on port 3000 at the `/admin` path
+(e.g. `http://homeassistant.local:3000/admin`). From there you manage
+machines, users, ACLs and DNS settings.
 
-- Login: con una API key di Headscale, da creare dal terminale dell'add-on
-  con `headscale apikeys create --expiration 90d`, oppure via OpenID
-  Connect (vedi sotto).
-- `headplane_base_url` deve corrispondere all'URL con cui si raggiunge la
-  dashboard (serve per cookie e redirect); con un URL `https://` i cookie
-  vengono marcati secure automaticamente.
-- Headscale gira nello stesso container: Headplane applica le modifiche
-  alla configurazione ricaricandolo via SIGHUP (integrazione `proc`),
-  senza permessi speciali.
+- Login: with a Headscale API key, created from the add-on container
+  terminal with `headscale apikeys create --expiration 90d`, or via
+  OpenID Connect (see below).
+- `headplane_base_url` must match the URL you use to reach the dashboard
+  (needed for cookies and redirects); with an `https://` URL the cookies
+  are automatically marked secure.
+- Headscale runs in the same container: Headplane applies configuration
+  changes by reloading it via SIGHUP (`proc` integration), with no
+  special permissions.
 
-Come vengono applicate le modifiche fatte da Headplane:
+How changes made from Headplane are applied:
 
-| Modifica | Applicazione |
+| Change | Application |
 |---|---|
-| Record DNS extra | A caldo, immediata (`dns_records.json` ricaricato da headscale) |
-| ACL | Immediata (API headscale / SIGHUP) |
-| Impostazioni DNS (nameserver, split DNS, override, base domain, MagicDNS) e restrizioni OIDC | Riavvio automatico del solo servizio headscale entro ~10 secondi (l'add-on e Headplane restano su; i client si riconnettono da soli) |
+| Extra DNS records | Hot, immediate (`dns_records.json` reloaded by headscale) |
+| ACLs | Immediate (headscale API / SIGHUP) |
+| DNS settings (nameservers, split DNS, override, base domain, MagicDNS) and OIDC restrictions | Automatic restart of the headscale service only within ~10 seconds; right after, the dashboard restarts too (to re-attach to the new process). The add-on stays up and clients reconnect on their own |
 
-#### Login OIDC per Headplane
+#### OIDC login for Headplane
 
-Con `headplane_oidc_enabled: true` il login alla dashboard avviene tramite
-OpenID Connect. Se le opzioni `headplane_oidc_issuer` / `_client_id` /
-`_client_secret` non sono valorizzate, vengono riusate le impostazioni
-OIDC di headscale (è il setup raccomandato: stesso client sull'identity
-provider). Richiede:
+With `headplane_oidc_enabled: true` the dashboard login happens through
+OpenID Connect. If the `headplane_oidc_issuer` / `_client_id` /
+`_client_secret` options are not set, headscale's OIDC settings are
+reused (the recommended setup: same client on the identity provider).
+It requires:
 
-- `headplane_enabled: true` (e, se si riusano le credenziali,
+- `headplane_enabled: true` (and, when reusing the credentials,
   `oidc_enabled: true`);
-- sull'identity provider, autorizzare il redirect URI
+- on the identity provider, allow the redirect URI
   `<headplane_base_url>/admin/oidc/callback`.
 
-Al primo avvio l'add-on genera automaticamente una API key di Headscale
-dedicata a Headplane (scadenza 10 anni, salvata nella directory dati): è
-ciò che Headplane usa per parlare con l'API quando gli utenti accedono via
-OIDC. Il login con API key resta disponibile come ripiego.
+On first start the add-on automatically issues a Headscale API key
+dedicated to Headplane (10-year expiration, stored in the data
+directory): it is what Headplane uses to talk to the API when users log
+in via OIDC. API key login remains available as a fallback.
 
-### DNS e restrizioni OIDC (Headplane o modifica manuale)
+### DNS and OIDC restrictions (Headplane or manual edits)
 
-Le impostazioni DNS (`dns.magic_dns`, `dns.base_domain`,
-`dns.override_local_dns`, `dns.nameservers`, `dns.search_domains`) e le
-restrizioni di accesso OIDC (`oidc.allowed_*`) **non sono opzioni
-dell'add-on**: nel config generato partono dai default (MagicDNS attivo,
-base domain `tailnet.internal`, nameserver Cloudflare) e si modificano da
-una dashboard [Headplane](https://github.com/tale/headplane) oppure
-modificando direttamente `config.yaml` nella cartella di configurazione.
-Così c'è un'unica fonte di modifica e nessun rischio di conflitto con la UI.
+The DNS settings (`dns.magic_dns`, `dns.base_domain`,
+`dns.override_local_dns`, `dns.nameservers`, `dns.search_domains`) and
+the OIDC access restrictions (`oidc.allowed_*`) are **not add-on
+options**: the generated config starts from defaults (MagicDNS on, base
+domain `tailnet.internal`, Cloudflare nameservers) and they are changed
+from a [Headplane](https://github.com/tale/headplane) dashboard or by
+editing `config.yaml` in the configuration folder directly. This keeps a
+single source of change and avoids conflicts with the UI options.
 
-Le modifiche a queste chiavi sopravvivono alla rigenerazione: a ogni avvio
-vengono confrontate col config generato all'avvio precedente, salvate come
-override nella directory dati persistente (`/var/lib/headscale`, inclusa
-nei backup) e riapplicate. Riportare una chiave al suo valore di default
-rimuove l'override. I record DNS extra vivono in
-`dns_records.json` (referenziato via `dns.extra_records_path`): Headplane ci
-scrive e Headscale li ricarica a caldo, senza riavvio.
+Changes to these keys survive regeneration: on every start they are
+compared with the config generated at the previous start, stored as
+overrides in the persistent data directory (`/var/lib/headscale`,
+included in backups) and re-applied. Setting a key back to its default
+removes the override. Extra DNS records live in `dns_records.json`
+(referenced via `dns.extra_records_path`): Headplane writes to it and
+Headscale hot-reloads it, no restart needed.
 
-## Uso della CLI
+## CLI usage
 
-I comandi amministrativi (creazione utenti, preauth key, ecc.) si eseguono
-dal terminale del container dell'add-on, ad esempio:
+Administrative commands (creating users, preauth keys, etc.) run from
+the add-on container terminal, for example:
 
 ```bash
 headscale users create alessio
 headscale preauthkeys create --user 1
 ```
 
-In alternativa la CLI può collegarsi da remoto via gRPC (porta 50443,
-disabilitata di default — abilitarla nella configurazione di rete
-dell'add-on): richiede certificati TLS validi sul `server_url` e una API key
+Alternatively the CLI can connect remotely over gRPC (port 50443,
+disabled by default — enable it in the add-on network configuration): it
+requires valid TLS certificates on the `server_url` and an API key
 (`headscale apikeys create`).
 
-## Dati
+## Data
 
-- Stato e database SQLite: `/var/lib/headscale` (incluso nei backup di
-  Home Assistant).
-- Configurazione: cartella `addon_config`, visibile dall'editor file di
-  Home Assistant.
+- State and SQLite database: `/var/lib/headscale` (included in Home
+  Assistant backups).
+- Configuration: the `addon_config` folder, visible from the Home
+  Assistant file editor.

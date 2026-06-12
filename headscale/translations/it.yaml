@@ -1,0 +1,99 @@
+---
+configuration:
+  server_url:
+    name: URL del server
+    description: >-
+      L'URL pubblico con cui i client Tailscale raggiungono questo server
+      Headscale (es. https://headscale.example.com). Deve essere
+      raggiungibile dall'esterno.
+  log_level:
+    name: Livello di log
+    description: Verbosità dei log di Headscale.
+  ipv4_prefix:
+    name: Prefisso IPv4
+    description: >-
+      Range IPv4 da cui assegnare gli indirizzi della tailnet. Deve essere
+      una sottorete di 100.64.0.0/10.
+  ipv6_prefix:
+    name: Prefisso IPv6
+    description: >-
+      Range IPv6 da cui assegnare gli indirizzi della tailnet. Deve essere
+      una sottorete di fd7a:115c:a1e0::/48.
+  address_allocation:
+    name: Strategia di assegnazione IP
+    description: >-
+      Come vengono assegnati gli IP della tailnet ai nuovi nodi: sequential
+      (primo IP libero) o random.
+  ephemeral_node_inactivity_timeout:
+    name: Timeout di inattività nodi effimeri
+    description: >-
+      Tempo dopo il quale un nodo effimero inattivo viene eliminato
+      (es. 30m).
+  policy_mode:
+    name: Modalità policy ACL
+    description: >-
+      Dove sono salvate le policy ACL: "file" (file HuJSON, vedi Percorso
+      policy ACL) o "database" (gestite via API/CLI di Headscale).
+  policy_path:
+    name: Percorso policy ACL
+    description: >-
+      Percorso opzionale di un file ACL HuJSON, es.
+      /etc/headscale/acl.hujson (mettere il file nella cartella di
+      configurazione dell'add-on). Usato solo con modalità policy "file".
+  oidc_enabled:
+    name: Abilita OpenID Connect
+    description: >-
+      Autentica gli utenti tramite un identity provider OpenID Connect.
+      Se abilitato, issuer, client ID e client secret sono obbligatori.
+  oidc_issuer:
+    name: URL issuer OIDC
+    description: URL dell'issuer OpenID Connect dell'identity provider.
+  oidc_client_id:
+    name: Client ID OIDC
+    description: Client ID fornito dall'identity provider.
+  oidc_client_secret:
+    name: Client secret OIDC
+    description: Client secret generato dall'identity provider.
+  oidc_expiry:
+    name: Scadenza sessione OIDC
+    description: >-
+      Per quanto tempo un nodo resta autenticato prima di dover rifare il
+      login (es. 180d). Usare 0 per nessuna scadenza. Vuoto = default di
+      Headscale.
+  oidc_scope:
+    name: Scope OIDC
+    description: Scope OIDC da richiedere; includere sempre "openid".
+  oidc_pkce_enabled:
+    name: PKCE OIDC
+    description: Abilita PKCE (Proof Key for Code Exchange) per il flusso OIDC.
+  headplane_enabled:
+    name: Dashboard Headplane
+    description: >-
+      Avvia la web UI Headplane integrata (porta 3000, percorso /admin) per
+      gestire Headscale: macchine, utenti, ACL, impostazioni DNS. Login con
+      una API key di Headscale ("headscale apikeys create" dal terminale
+      dell'add-on) o via OIDC.
+  headplane_base_url:
+    name: URL base di Headplane
+    description: >-
+      URL pubblico con cui si raggiunge la dashboard Headplane (usato per
+      cookie e redirect), es. http://homeassistant.local:3000 o l'URL del
+      reverse proxy davanti.
+  headplane_oidc_enabled:
+    name: Login OIDC per Headplane
+    description: >-
+      Accedi alla dashboard Headplane via OpenID Connect. Se non
+      sovrascritte qui sotto, vengono riusate le impostazioni OIDC di
+      headscale (consigliato: stesso client sull'identity provider). Il
+      provider deve autorizzare il redirect URI
+      <URL base>/admin/oidc/callback. Il login con API key resta
+      disponibile come ripiego.
+  headplane_oidc_issuer:
+    name: Issuer OIDC di Headplane
+    description: Sovrascrive l'URL issuer OIDC solo per Headplane.
+  headplane_oidc_client_id:
+    name: Client ID OIDC di Headplane
+    description: Sovrascrive il client ID OIDC solo per Headplane.
+  headplane_oidc_client_secret:
+    name: Client secret OIDC di Headplane
+    description: Sovrascrive il client secret OIDC solo per Headplane.
